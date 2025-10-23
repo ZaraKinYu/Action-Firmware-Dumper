@@ -30,13 +30,15 @@ jobs:
     - name: Setup Dump Environment
       run: |
         mkdir -p workspace && cd workspace
-        git clone https://github.com/AndroidDumps/dumpyara.git ./dumpyara
-        cd dumpyara && bash setup.sh
+        python3 -m venv ubn
+        . ubn/bin/activate
+        pip3 install dumpyara
 
     - name: Dump Firmware
       run: |
         cd workspace/dumpyara
-        bash dumpyara.sh ${{ github.event.inputs.FIRMWARE_LINK }}
+        wget ${{ github.event.inputs.FIRMWARE_LINK }}
+        python3 -m dumpyara *.tgz
         cd out
         echo "MANUFACTURER_NAME=$(grep "ro.product.vendor.manufacturer" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
 
