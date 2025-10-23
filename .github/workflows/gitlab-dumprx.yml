@@ -36,16 +36,17 @@ jobs:
 
     - name: Dump Firmware
       run: |
-        cd workspace/dumpyara
-        wget ${{ github.event.inputs.FIRMWARE_LINK }}
-        python3 -m dumpyara *.tgz
-        cd warm_in_global_images_OS2.0.202.0.VGVINXM_20250829.0000.00_15.0_in_dd2ca391fc
+        mkdir dumpyara
+        cd dumpyara
+        wget ${{ github.event.inputs.FIRMWARE_LINK }} >> firmware.tgz
+        python3 -m dumpyara firmware.tgz
+        cd firmware
         echo "MANUFACTURER_NAME=$(grep "ro.product.vendor.manufacturer" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
 
     - name: Set Variables - if oplus
       if: env.MANUFACTURER_NAME == 'oplus'
       run: |
-        cd workspace/dumpyara/out
+        cd workspace/dumpyara/firmware
         rm -rf .git
         if [ -d odm ]; then
            echo "ODM directory exist..."
@@ -61,7 +62,7 @@ jobs:
     - name: Set Variables - if others
       if: env.MANUFACTURER_NAME != 'oplus'
       run: |
-        cd workspace/dumpyara/out
+        cd workspace/dumpyara/firmware
         rm -rf .git
         echo "VENDOR_NAME=$(grep "ro.product.vendor.device" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
         echo "BRANCH=$(grep "ro.vendor.build.id" vendor/build.prop | awk -F "=" '{split($2, words, " "); print words[1]; exit}')" >> $GITHUB_ENV
@@ -75,7 +76,7 @@ jobs:
 
     - name: Push as Repository
       run: |
-        cd workspace/dumpyara/out
+        cd workspace/dumpyara/firmware
         rm -rf .git
         rm -rf .gitignore
         rm -rf .gitattributes
