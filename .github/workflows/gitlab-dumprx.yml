@@ -36,6 +36,8 @@ jobs:
 
     - name: Dump Firmware
       run: |
+       sudo apt install android-sdk-libsparse-utils 
+       sudo apt install erofs-utils
         python3 -m venv ubn
         . ubn/bin/activate
         pip3 install dumpyara
